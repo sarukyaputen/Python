@@ -1,0 +1,19 @@
+#http://www.twse.com.tw/zh/page/trading/exchange/MI_5MINS.html
+
+import requests ,pandas
+import time
+import json
+from  bs4  import    BeautifulSoup
+
+res = requests.get('http://www.twse.com.tw/exchangeReport/MI_5MINS?response=json&date=&_=1516888449067')
+
+
+#print(res.json())
+a=json.loads(res.text)
+#print(a)
+
+A1=pandas.DataFrame((a['data'][0:8]))
+
+print(len(a['data']))
+#print(a['data'])
+print(A1)
