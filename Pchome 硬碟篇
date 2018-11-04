@@ -1,0 +1,53 @@
+import requests,json
+import time
+import json,sqlite3
+from bs4 import BeautifulSoup
+
+conn=sqlite3.connect("pchome.db")
+cursor=conn.cursor()
+sqlstr='CREATE TABLE IF NOT EXISTS  tt16 \
+("num" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "Name" TEXT,"describe" TEXT,"price" TEXT,"originPrice" TEXT)'
+     
+cursor.execute(sqlstr)
+
+
+for s1 in range(100):
+    url="https://ecshweb.pchome.com.tw/search/v3.3/all/results?q=%E8%A1%8C%E5%8B%95%E7%A1%AC%E7%A2%9F%20%E7%89%B9%E5%83%B9&page=" +str( s1) + "&sort=rnk/dc"
+    #print(url)
+    #print(url.text)
+    resp = requests.get(url)
+    #print(resp)
+    #soup = BeautifulSoup(resp.text, 'html.parser')
+    #print(soup.text)
+    
+    #url.encoding="utf-8"
+    data = json.loads(resp.text)
+    #print(data)
+    
+    aa=len(data["prods"])-1
+    
+    #print(aa)    
+    for s in range(aa):
+        a2=data["prods"][s]
+        #print(a2)
+        for  k in a2:
+            name=a2["name"]
+            describe=a2["describe"]
+            price=a2["price"]
+            originPrice=a2["originPrice"]
+        #print (name,describe,price,originPrice)
+        #print("產品名子 :{}\n介紹：{}\n價格={}\n特價:{}".format(name,describe,price,originPrice))
+        #print(s1)
+        sqlstr="insert into tt16 (name,describe,price,originPrice) values ('"+name+"','"+describe+"','"+str(price)+"','"+str(originPrice)+"')"
+        
+
+        cursor.execute(sqlstr)
+        conn.commit() # 主動更新   
+    time.sleep(5)
+    print(s1)  
+#         print(k)
+# #     
+# # print(len(a))
+# data=json.loads(resp.text)
+# 
+# print(data)
