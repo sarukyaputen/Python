@@ -1,0 +1,63 @@
+import requests,sqlite3,time,json
+
+def main():
+
+    localtime = time.asctime( time.localtime(time.time()) )
+#     print ("本地时间为 :", localtime)
+    
+    html = requests.get("http://data.ntpc.gov.tw/api/v1/rest/datastore/382000000A-000352-001")
+    print(html)
+    html.encoding="utf-8"
+    html = json.loads(html.text)
+    
+#     html = requests.get("http://data.ntpc.gov.tw/api/v1/rest/datastore/382000000A-000352-001")
+#     html.encoding="utf-8"
+    # print(html.text)
+    conn=sqlite3.connect("Packing space.db")
+    cursor=conn.cursor()
+    sqlstr='CREATE TABLE IF NOT EXISTS yyy1 \
+    ("num" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "snoo" TEXT,"snaa" TEXT,"tott" TEXT,"sbii" TEXT,"mdayy" TEXT,"sareaa" TEXT,"latt" TEXT,"lngg" TEXT,"arrrr" TEXT,"sareaenn" TEXT,"snaenn" TEXT,"bempp" TEXT,"actt" TEXT,"time" )'
+    cursor.execute(sqlstr)
+#     print(html)
+
+    #a1=html['result']
+    #a2=a1['records']
+    a2=html['result']['records']
+    #print(a2)
+
+
+     # 轉成json格式
+    
+      
+    for park in a2:
+    # sno:站點代號、sna:場站名稱(中文)、tot:場站總停車格、sbi:可借車位數、sarea:場站區域(中文)、mday:資料更新時間
+    #、lat:緯度、lng:經度、ar:地址(中文)、sareaen:場站區域(英文)、snaen:場站名稱(英文)、:aren、地址(英文)、:bemp:可還空位數、act:場站是否暫停營運
+        snoo=park["sno"]
+        snaa=park["sna"]
+        tott=park["tot"]
+        sbii=park["sbi"]
+        sareaa=park["sarea"]
+        mdayy=park["mday"]
+        latt=park["lat"]
+        lngg=park["lng"]
+        arrrr=park["ar"]
+        sareaenn=park["sareaen"]
+        snaenn=park["snaen"].replace("'","")
+        bempp=park["bemp"]
+        actt=park["act"]
+        
+        
+       # print("站點代號名稱 :{}{}\n場站總停車格：{}\n可借車位數={}\ntime:{}".format(snoo,snaa,sareaa,sbii,localtime))
+        #print(localtime) 
+        sqlstr="insert into yyy1 (snoo,snaa,tott,sbii,sareaa,mdayy,latt,lngg,arrrr,sareaenn,time) values ('"+snoo+"','"+snaa+"','"+tott+"','"+sbii+"','"+sareaa+"','"+mdayy+"','"+latt+"','"+lngg+"','"+arrrr+"','"+sareaenn+"','"+localtime+"')"
+        cursor.execute(sqlstr)
+        conn.commit() # 主動更新    
+    conn.close()
+
+if __name__ == '__main__':
+    
+    for i in range(1,1000):
+    
+        main()
+        time.sleep(60)
+        print(i)
