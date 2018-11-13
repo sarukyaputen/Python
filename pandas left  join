@@ -1,0 +1,18 @@
+import csv
+import pandas as pd
+
+df1=pd.read_csv("f:\\A.csv")
+df2=pd.read_csv("f:\\B.csv")
+df3=pd.read_csv("f:\\C.csv")
+print(df1)
+print(df2)
+#print(df3) 第三張表串聯  
+
+
+s2 = pd.merge(df1, df2, how='left', on=["Val1"])
+print(s2)
+
+s1 = pd.merge(df1, df2, how='left', on=['Year', 'Week', 'Colour'])
+df = pd.merge(s1, df3[['Week', 'Colour', 'Val3']],how='left', on=['Week', 'Colour'])
+#print(df)
+
