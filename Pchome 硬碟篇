@@ -45,9 +45,8 @@ for s1 in range(100):
         conn.commit() # 主動更新   
     time.sleep(5)
     print(s1)  
-#         print(k)
-# #     
-# # print(len(a))
+#.............................. 註解 
+# print(len(a))
 # data=json.loads(resp.text)
 # 
 # print(data)
