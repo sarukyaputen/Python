@@ -1,0 +1,70 @@
+import requests,json,re,os,sqlite3,time  # expedia
+from bs4 import BeautifulSoup
+
+p=input("請輸入 資料庫名稱")
+
+for v in range(1,16):        # 抓出15個頁面
+    print(v)
+    time.sleep(25)
+    u2="https://www.expedia.com.tw/Hotel-Search-Data?responsive=true"
+    payload={
+        "destination":"花蓮縣, 台灣",
+        "startDate":"2019/01/15",
+        "endDate":"2019/01/16",
+        "adults":"2",
+        "regionId":"6177563",
+        "sort":"recommended",
+        "page":str(v),
+        "langid":"1028",
+        "hsrIdentifier":"HSR",
+        "timezoneOffset":"28800000",
+    }
+             
+    res=requests.post(u2,data=payload)    
+    time.sleep(5)
+    
+    soup = BeautifulSoup(res.text,'html.parser')
+    html = json.loads(soup.text)
+    
+    conn=sqlite3.connect("a.db")    # 要轉CSV  先存到sqite資料庫
+    cursor=conn.cursor()
+    sqlstr='CREATE TABLE IF NOT EXISTS '+str(p) + '\
+    ("num" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "飯店名稱" TEXT,"星評" TEXT,"星評2" TEXT,"評價" TEXT,"價格" TEXT,"頁面" TEXT,"time" )'
+    cursor.execute(sqlstr)
+
+    
+    
+    html2=(html["searchResults"]["retailHotelModels"]) #找到主頁面
+
+    localtime = time.asctime( time.localtime(time.time()) )  # 時間
+    
+    for i in range(0,49):  # 每頁的項目抓出
+
+        try:
+            b1=(html2[i]["retailHotelInfoModel"]["localizedHotelName"])    # 名稱
+        except Exception:
+            b1="出錯誤"
+        try:
+            b2=(html2[i]["hotelStarRating"])    # 圖示 星星幾分
+        except Exception:
+            b2="出錯誤" 
+        try:    
+            b3=(html2[i]["ugcModel"]["superlativeMessage"])  # 評價     
+        except Exception:
+            b3="出錯誤" 
+        try:
+            b4=(html2[i]["retailHotelPricingModel"]["priceFormatted"]) # 價格
+        except Exception:
+            b4="出錯誤"
+            
+        try:
+            b5=(html2[i]["ugcModel"]["guestRating"]) # 星星幾分
+        except Exception:
+            b5="出錯誤"
+                        
+        sqlstr="insert into "+str(p)+" (飯店名稱,星評,星評2,評價,價格,頁面,time) values ('"+b1+"','"+b2+"','"+b5+"','"+b4+"','"+b3+"','"+str(v)+"','"+localtime+"')"
+        
+        cursor.execute(sqlstr)
+        print(sqlstr)
+        conn.commit() # 主動更新    
+    conn.close()     # 關閉資料庫
