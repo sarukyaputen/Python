@@ -1,0 +1,181 @@
+import requests,json,re,os,sqlite3,threading
+from time  import sleep ,time, ctime
+
+#import requests,json,re
+#import time
+from bs4 import BeautifulSoup
+#from pyquery import PyQuery
+
+
+#database=input("請輸入 資料庫名稱")
+
+def Homepage(count):
+    conn=sqlite3.connect("a1.db")    # 要轉CSV  先存到sqite資料庫
+    cursor=conn.cursor()
+    sqlstr='CREATE TABLE IF NOT EXISTS '+str("a1") + '\
+    ("num" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "題目名稱" TEXT,"mobile內容" TEXT )'
+    cursor.execute(sqlstr)
+    
+    url="https://www.mobile01.com/topicdetail.php?f=291&t=5151170&p="+str(count)
+#   url="https://www.mobile01.com/topicdetail.php?f=291&t=5151170&p="+Finalpage(input)
+    
+    yy={"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"}
+        
+#     payload={
+#           
+#     "f": "291",
+#     "t": "5151170",
+#     "p": "4",
+#         }    
+    #res=requests.get(url,params=payload)
+    
+    # 
+    res =requests.get(url,headers=yy)
+    
+    i=0
+    soup = BeautifulSoup(res.text,"html.parser")
+    
+    for i,title in enumerate(soup.select(".single-post-content")):      
+        target= title.text.strip()    
+        sqlstr="insert into "+str("a1")+" (題目名稱,mobile內容) values ('"+str(i)+"','"+target+"')"
+        print(target)   
+    #    print(sqlstr)
+        cursor.execute(sqlstr)
+        conn.commit() # 主動更新    
+    conn.close()     # 關閉資料庫
+
+
+def Finalpage(inputpage):
+
+    url=inputpage
+#    print(url)
+    yy={"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"}        
+    res =requests.get(url,headers=yy)
+    soup = BeautifulSoup(res.text,"html.parser")
+    final=soup.select(".pagination a")[10].text
+    
+#    print(final)
+    
+    return (final)
+
+def url():
+    inputurl=input("請輸入網址")
+ 
+    return(inputurl)
+
+def Finalpage2(inputpage):
+
+    url=inputpage
+#    print(url)
+    yy={"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"}        
+    res =requests.get(url,headers=yy)
+    soup = BeautifulSoup(res.text,"html.parser")
+    final2=soup.select(".pagination a")[9].text
+            
+#    print(final)
+    return(final2)
+
+def aaa():
+    url="https://www.mobile01.com/topicdetail.php?f=291&t=5151170&p=1"
+    yy={"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"}
+    res =requests.get(url,headers=yy) 
+    soup = BeautifulSoup(res.text,"html.parser")
+    for title in soup.select(".date"):
+        print(title.text)   
+
+
+def test():
+    b=[]
+    url="https://www.mobile01.com/topicdetail.php?f=291&t=5151170&p=10"
+    yy={"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"}
+    res =requests.get(url,headers=yy) 
+    soup = BeautifulSoup(res.text,"html.parser")
+    for title in soup.select(".date"):
+        a=title.text
+       # b=b.append(a)
+        print(a)
+        
+
+
+if __name__ == '__main__':    
+
+ 
+#    test()
+ #-----------------------------------------   
+    input01=input("請輸入頁數")
+    for i in range(1,int(input01)):
+        try:
+            Homepage(i)
+        except Exception:
+             
+            conn=sqlite3.connect("a1.db")    # 要轉CSV  先存到sqite資料庫
+            cursor=conn.cursor()
+            sqlstr="insert into "+str("a1")+" (題目名稱,mobile內容) values ('"+str(i)+"','"+str(i)+"')"
+            cursor.execute(sqlstr)
+            conn.commit()
+            conn.close()
+    print("1")        
+    print(time.sleep(10))
+    print("9")
+  #  print('end:%s'%ctime())
+ #---------------------------------------------------
+ 
+ 
+ 
+ 
+    
+    
+    
+    
+    
+#     for i in range(3,int(Finalpage(page))):
+#         Homepage(i)
+#   print(Finalpage(page))
+
+    
+  
+#   final=Finalpage()
+#   print(final)
+   
+# 
+# import requests
+# from bs4 import BeautifulSoup
+#   
+# page = int(input("請輸入要擷取的頁數"))
+# for i in range(1,page+1):
+#     res = requests.get("https://www.mobile01.com/forumtopic.php?c=17&p="+ str(i))
+#     soup = BeautifulSoup(res.text,"html.parser")
+#     for title in soup.select(".topic_gen"):
+#         print ("==============")
+#         url = str(title.get('href'))
+#         print ("[標題]:"+title.text,"\n"+"https://www.mobile01.com/"+url)
+
+
+
+
+
+
+#print(res)
+#
+
+#print(res.request.headers)
+
+# resh=res.history
+#print(res.content)
+#print(res.status_code)
+# 
+# soup = BeautifulSoup(res.text,'html.parser')
+# 
+# #----------------------------------------------------------------------------
+# dcard_title = soup.find_all('main', re.compile('article'))
+#       
+#       
+# for index ,item in  enumerate(dcard_title[:15]):
+#   
+#     print(index,item.text.strip())
+    
+
+    
+#-----------------------------------------------------------------------------    
+
+
